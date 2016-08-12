@@ -286,6 +286,23 @@ void *GPFSFSAL_UP_Thread(void *Arg)
 					    flags, callback.buf->st_ino,
 					    (int)callback.buf->st_nlink);
 
+                                /* Check if the number of links are zero, 
+ 				 * then it means that the file got deleted. 
+ 				 * Go for invalidating the file and related 
+ 				 * cleanup activity
+ 				 */ 
+                                if ((flags & UP_NLINK) && (callback.buf->st_nlink == 0)) {
+                                    LogMidDebug(COMPONENT_FSAL_UP, "Invalidating the inode");
+                                    upflags = CACHE_INODE_INVALIDATE_ATTRS |
+                                                CACHE_INODE_INVALIDATE_CONTENT;
+                                    rc = event_func->invalidate_close(
+                                                gpfs_fs->fs->fsal,
+                                                event_func,
+                                                &key,
+                                                upflags);
+                                    break;
+                                }
+
 				/** @todo: This notification is completely
 				 * asynchronous.  If we happen to change some
 				 * of the attributes later, we end up over
@@ -371,17 +388,6 @@ void *GPFSFSAL_UP_Thread(void *Arg)
 					    update(event_func->export,
 						   &key, &attr, upflags);
 
-					if ((flags & UP_NLINK)
-					    && (attr.numlinks == 0)) {
-						upflags = fsal_up_nlink |
-							  fsal_up_close;
-						attr.mask = 0;
-						fsal_status = up_async_update
-						    (general_fridge,
-						     event_func->export,
-						     &key, &attr,
-						     upflags, NULL, NULL);
-					}
 				}
 			}
 			break;
