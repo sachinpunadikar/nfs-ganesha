@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "baa041b7_43f0d891",
+        "filename": "src/FSAL/FSAL_GPFS/fsal_up.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 305,
+      "author": {
+        "id": 1003947
+      },
+      "writtenOn": "2016-08-16T21:18:55Z",
+      "side": 1,
+      "message": "The actual issue seems to be incorrect flags. I uploaded a patch here. We will also cover other updates with that patch.\n\nWe may need this kind of patch as well. Let us check with Marc Eshel.\n\nHere is what I posted:\nhttps://review.gerrithub.io/287569",
+      "revId": "9cfb684901621ba83882c0a75d4e66001e31695c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    }
+  ]
+}
