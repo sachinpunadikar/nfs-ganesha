@@ -19,7 +19,10 @@ endif(CEPH_PREFIX)
 
 add_library(fsalceph SHARED ${fsalceph_LIB_SRCS})
 
-target_link_libraries(fsalceph cephfs ${SYSTEM_LIBRARIES})
+add_library(fsalceph MODULE ${fsalceph_LIB_SRCS})
+add_sanitizers(fsalceph)
+
+target_link_libraries(fsalceph ${CEPHFS_LIBRARIES} ${SYSTEM_LIBRARIES})
 
 set_target_properties(fsalceph PROPERTIES VERSION 4.2.0 SOVERSION 4)
 install(TARGETS fsalceph COMPONENT fsal DESTINATION ${FSAL_DESTINATION} )

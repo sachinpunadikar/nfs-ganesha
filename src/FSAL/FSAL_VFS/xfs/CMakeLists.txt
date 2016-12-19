@@ -14,7 +14,13 @@ SET(fsalxfs_LIB_SRCS
    subfsal_xfs.c
   )
 
-add_library(fsalxfs SHARED ${fsalxfs_LIB_SRCS})
+add_library(fsalxfs MODULE ${fsalxfs_LIB_SRCS})
+add_sanitizers(fsalxfs)
+if(PATH_LIBHANDLE)
+add_library(handle SHARED IMPORTED)
+add_sanitizers(handle)
+set_target_properties(handle PROPERTIES IMPORTED_LOCATION ${PATH_LIBHANDLE})
+endif(PATH_LIBHANDLE)
 
 target_link_libraries(fsalxfs
   gos
