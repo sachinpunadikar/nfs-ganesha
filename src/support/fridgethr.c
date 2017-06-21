@@ -1119,6 +1119,8 @@ int fridgethr_stop(struct fridgethr *fr, pthread_mutex_t *mtx,
 			if (fr->p.wake_threads != NULL)
 				fr->p.wake_threads(fr->p.wake_threads_arg);
 		}
+		/* Complete the transition so that caller will get notified */
+		fridgethr_finish_transition(fr, true);
 		PTHREAD_MUTEX_unlock(&fr->mtx);
 	} else {
 		/* Well, this is embarrassing. */
@@ -1353,7 +1355,7 @@ int fridgethr_sync_command(struct fridgethr *fr, fridgethr_comm_t command,
  * @brief Return true if a looper function should return
  *
  * For the moment, this checks if we're in the middle of a state
- * transition.
+ * transition. Also checks if the command is not fridgethr_comm_run.
  *
  * @param[in] ctx The thread context
  *
@@ -1370,7 +1372,10 @@ bool fridgethr_you_should_break(struct fridgethr_context *ctx)
 	bool rc;
 
 	PTHREAD_MUTEX_lock(&fr->mtx);
-	rc = fr->transitioning;
+	if (fr->command != fridgethr_comm_run)
+		rc = true;
+	else
+		rc = fr->transitioning;
 	PTHREAD_MUTEX_unlock(&fr->mtx);
 	return rc;
 }
