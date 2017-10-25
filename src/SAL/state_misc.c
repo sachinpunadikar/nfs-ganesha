@@ -1072,6 +1072,7 @@ void dec_state_owner_ref(state_owner_t *owner)
  */
 void uncache_nfs4_owner(struct state_nfs4_owner_t *nfs4_owner)
 {
+	hash_table_t *ht_owner;
 	state_owner_t *owner = container_of(nfs4_owner,
 					    state_owner_t,
 					    so_owner.so_nfs4_owner);
@@ -1095,6 +1096,21 @@ void uncache_nfs4_owner(struct state_nfs4_owner_t *nfs4_owner)
 
 	glist_init(&nfs4_owner->so_state_list);
 
+	/* RTC 172754 Hack - check if the owner is correct. 
+	 * If not just return from here. Check if refcount is 0.
+	 * If valid owner & refcount 0, increment refcount to free
+	 * the owner
+	 */
+	ht_owner = get_state_owner_hash_table(owner);
+	if (ht_owner == NULL) {
+		LogEvent(COMPONENT_STATE,"Owner not present, skipping it");
+		return;
+	}
+	if (atomic_fetch_int32_t(&owner->so_refcount) == 0) {
+		LogEvent(COMPONENT_STATE,
+		"Increasing the refcount for safe removal of the owner");
+		(void) atomic_inc_int32_t(&owner->so_refcount);
+	}
 	atomic_store_time_t(&nfs4_owner->cache_expire, 0);
 
 	dec_state_owner_ref(owner);
