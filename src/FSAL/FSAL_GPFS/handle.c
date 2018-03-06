@@ -971,8 +971,8 @@ static void release(struct fsal_obj_handle *obj_hdl)
 	if (type == REGULAR_FILE) {
 		PTHREAD_RWLOCK_wrlock(&obj_hdl->obj_lock);
 
-		if (myself->u.file.fd.fd >= 0 &&
-		    myself->u.file.fd.openflags != FSAL_O_CLOSED) {
+		if (myself->u.file.fd.openflags != FSAL_O_CLOSED) {
+			assert(myself->u.file.fd.fd >= 3);
 			fsal_internal_close(myself->u.file.fd.fd, NULL, 0);
 			myself->u.file.fd.fd = -1;
 			myself->u.file.fd.openflags = FSAL_O_CLOSED;

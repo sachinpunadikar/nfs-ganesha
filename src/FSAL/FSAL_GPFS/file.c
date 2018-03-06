@@ -151,7 +151,7 @@ open_by_handle(struct fsal_obj_handle *obj_hdl, struct state_t *state,
 	fsal_status_t status;
 	const bool truncated = (posix_flags & O_TRUNC) != 0;
 	struct gpfs_fd *my_fd;
-	int fd;
+	int fd = -1;
 
 	/* This can block over an I/O operation. */
 	PTHREAD_RWLOCK_wrlock(&obj_hdl->obj_lock);
@@ -200,7 +200,7 @@ open_by_handle(struct fsal_obj_handle *obj_hdl, struct state_t *state,
 	 * one. There shouldn't be any old open for state based call.
 	 */
 	if (my_fd->openflags != FSAL_O_CLOSED) {
-		assert(my_fd->fd >= 0);
+		assert(my_fd->fd >= 3);
 		/* assert(state == NULL); */
 		(void)fsal_internal_close(my_fd->fd, NULL, 0);
 	}
@@ -1182,7 +1182,7 @@ fsal_status_t gpfs_seek(struct fsal_obj_handle *obj_hdl, struct io_info *info)
 	struct gpfs_io_info io_info = {0};
 	struct fseek_arg arg = {0};
 
-	assert(myself->u.file.fd.fd >= 0 &&
+	assert(myself->u.file.fd.fd >= 3 &&
 	       myself->u.file.fd.openflags != FSAL_O_CLOSED);
 
 	arg.mountdirfd = myself->u.file.fd.fd;
@@ -1229,7 +1229,7 @@ gpfs_io_advise(struct fsal_obj_handle *obj_hdl, struct io_hints *hints)
 		container_of(obj_hdl, struct gpfs_fsal_obj_handle, obj_handle);
 	struct fadvise_arg arg = {0};
 
-	assert(myself->u.file.fd.fd >= 0 &&
+	assert(myself->u.file.fd.fd >= 3 &&
 	       myself->u.file.fd.openflags != FSAL_O_CLOSED);
 
 	arg.mountdirfd = myself->u.file.fd.fd;
@@ -1269,7 +1269,7 @@ fsal_status_t gpfs_close(struct fsal_obj_handle *obj_hdl)
 	 */
 	PTHREAD_RWLOCK_wrlock(&obj_hdl->obj_lock);
 
-	if (myself->u.file.fd.fd >= 0 &&
+	if (myself->u.file.fd.fd >= 3 &&
 	    myself->u.file.fd.openflags != FSAL_O_CLOSED) {
 		status = fsal_internal_close(myself->u.file.fd.fd, NULL, 0);
 		myself->u.file.fd.fd = -1;
@@ -1326,7 +1326,7 @@ gpfs_close2(struct fsal_obj_handle *obj_hdl, struct state_t *state)
 
 		PTHREAD_RWLOCK_unlock(&obj_hdl->obj_lock);
 	}
-	if (my_fd->fd > 0) {
+	if (my_fd->fd >= 3) {
 		LogFullDebug(COMPONENT_FSAL,
 			     "state %p fd %d", state, my_fd->fd);
 		state_owner = state->state_owner;
@@ -1334,6 +1334,10 @@ gpfs_close2(struct fsal_obj_handle *obj_hdl, struct state_t *state)
 		status = fsal_internal_close(my_fd->fd, state_owner, 0);
 		my_fd->fd = -1;
 		my_fd->openflags = FSAL_O_CLOSED;
+	} else {
+		LogWarn(COMPONENT_FSAL,
+		"File for closure with fd < 3, fd: %d. This should not happen",
+		my_fd->fd);
 	}
 	return status;
 }

@@ -111,6 +111,10 @@ fsal_internal_handle2fd(int dirfd, struct gpfs_file_handle *gpfs_fh,
 	if (unlikely(rc < 0))
 		return FSAL_INTERNAL_ERROR(errno, "OPENHANDLE_OPEN_BY_HANDLE");
 
+	if (rc < 3) {
+		LogCrit(COMPONENT_FSAL,
+			"GPFS Provided fd with value < 3, fd: %d",rc);
+	}
 	*fd = rc;
 	(void)atomic_inc_size_t(&open_fd_count);
 
