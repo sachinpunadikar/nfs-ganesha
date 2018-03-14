@@ -43,6 +43,8 @@
 #include <fcntl.h>
 #include "gpfs_methods.h"
 
+extern uint64_t get_handle2inode(struct gpfs_file_handle *gfh);
+
 static fsal_status_t
 gpfs_open_func(struct fsal_obj_handle *obj_hdl, fsal_openflags_t openflags,
 		struct fsal_fd *fd)
@@ -510,6 +512,12 @@ gpfs_open2(struct fsal_obj_handle *obj_hdl, struct state_t *state,
 		}
 
 	}
+	if (FSAL_IS_ERROR(status)) {
+		struct gpfs_file_handle *gfh = container_of(obj_hdl,
+				struct gpfs_fsal_obj_handle,obj_handle)->handle;
+		LogDebug(COMPONENT_FSAL,"Inode involved: %lu, error: %s",
+			get_handle2inode(gfh), msg_fsal_err(status.major));
+	}
 	return status;
 }
 
@@ -668,6 +676,12 @@ gpfs_reopen2(struct fsal_obj_handle *obj_hdl, struct state_t *state,
 		PTHREAD_RWLOCK_unlock(&obj_hdl->obj_lock);
 	}
 
+	if (FSAL_IS_ERROR(status)) {
+		struct gpfs_file_handle *gfh = container_of(obj_hdl,
+				struct gpfs_fsal_obj_handle,obj_handle)->handle;
+		LogDebug(COMPONENT_FSAL,"Inode involved: %lu, error: %s",
+			get_handle2inode(gfh), msg_fsal_err(status.major));
+	}
 	return status;
 }
 
@@ -839,6 +853,12 @@ gpfs_read2(struct fsal_obj_handle *obj_hdl, bool bypass, struct state_t *state,
 	if (has_lock)
 		PTHREAD_RWLOCK_unlock(&obj_hdl->obj_lock);
 
+	if (FSAL_IS_ERROR(status)) {
+		struct gpfs_file_handle *gfh = container_of(obj_hdl,
+				struct gpfs_fsal_obj_handle,obj_handle)->handle;
+		LogDebug(COMPONENT_FSAL,"Inode involved: %lu, error: %s",
+			get_handle2inode(gfh), msg_fsal_err(status.major));
+	}
 	return status;
 }
 
@@ -920,6 +940,12 @@ gpfs_write2(struct fsal_obj_handle *obj_hdl, bool bypass, struct state_t *state,
 	if (has_lock)
 		PTHREAD_RWLOCK_unlock(&obj_hdl->obj_lock);
 
+	if (FSAL_IS_ERROR(status)) {
+		struct gpfs_file_handle *gfh = container_of(obj_hdl,
+				struct gpfs_fsal_obj_handle,obj_handle)->handle;
+		LogDebug(COMPONENT_FSAL,"Inode involved: %lu, error: %s",
+			get_handle2inode(gfh), msg_fsal_err(status.major));
+	}
 	return status;
 }
 
@@ -1003,6 +1029,12 @@ gpfs_commit2(struct fsal_obj_handle *obj_hdl, off_t offset, size_t len)
 	if (has_lock)
 		PTHREAD_RWLOCK_unlock(&obj_hdl->obj_lock);
 
+	if (FSAL_IS_ERROR(status)) {
+		struct gpfs_file_handle *gfh = container_of(obj_hdl,
+				struct gpfs_fsal_obj_handle,obj_handle)->handle;
+		LogDebug(COMPONENT_FSAL,"Inode involved: %lu, error: %s",
+			get_handle2inode(gfh), msg_fsal_err(status.major));
+	}
 	return status;
 }
 
@@ -1163,6 +1195,12 @@ gpfs_lock_op2(struct fsal_obj_handle *obj_hdl, struct state_t *state,
 	if (has_lock)
 		PTHREAD_RWLOCK_unlock(&obj_hdl->obj_lock);
 
+	if (FSAL_IS_ERROR(status)) {
+		struct gpfs_file_handle *gfh = container_of(obj_hdl,
+				struct gpfs_fsal_obj_handle,obj_handle)->handle;
+		LogDebug(COMPONENT_FSAL,"Inode involved: %lu, error: %s",
+			get_handle2inode(gfh), msg_fsal_err(status.major));
+	}
 	return status;
 }
 
@@ -1338,6 +1376,12 @@ gpfs_close2(struct fsal_obj_handle *obj_hdl, struct state_t *state)
 		LogWarn(COMPONENT_FSAL,
 		"File for closure with fd < 3, fd: %d. This should not happen",
 		my_fd->fd);
+	}
+	if (FSAL_IS_ERROR(status)) {
+		struct gpfs_file_handle *gfh = container_of(obj_hdl,
+				struct gpfs_fsal_obj_handle,obj_handle)->handle;
+		LogDebug(COMPONENT_FSAL,"Inode involved: %lu, error: %s",
+			get_handle2inode(gfh), msg_fsal_err(status.major));
 	}
 	return status;
 }
