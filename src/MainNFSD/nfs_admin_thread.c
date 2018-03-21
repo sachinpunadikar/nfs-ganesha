@@ -399,8 +399,12 @@ static void do_shutdown(void)
 		LogEvent(COMPONENT_THREAD, "LRU thread system shut down.");
 	}
 
-	LogEvent(COMPONENT_MAIN, "Removing all exports.");
-	remove_all_exports();
+	/* Observed hang situation while removing the exports. As its shutdown
+	 * activity, we can skip removing exports. As we have skipped
+	 * remove_all_exports, mark the shutdown as disorderly */
+	/* LogEvent(COMPONENT_MAIN, "Removing all exports.");
+	remove_all_exports(); */
+	disorderly = true;
 
 	if (disorderly) {
 		LogMajor(COMPONENT_MAIN,
