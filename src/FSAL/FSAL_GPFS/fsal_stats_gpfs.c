@@ -184,9 +184,9 @@ void fsal_gpfs_extract_stats(struct fsal_module *fsal_hdl, void *iter)
 	DBusMessageIter *iter1 = (DBusMessageIter *)iter;
 	char *message;
 	uint64_t total_ops, total_resp, min_resp, max_resp;
-	double avg_resp;
+	double res;
 	int i;
-	uint16_t val;
+	/*uint16_t val;*/
 	struct fsal_stats *gpfs_stats;
 
 	now(&timestamp);
@@ -194,8 +194,8 @@ void fsal_gpfs_extract_stats(struct fsal_module *fsal_hdl, void *iter)
 	gpfs_stats = fsal_hdl->stats;
 	dbus_message_iter_open_container(iter1, DBUS_TYPE_STRUCT, NULL,
 					 &struct_iter);
-	val = atomic_fetch_uint16_t(&gpfs_stats->total_ops);
-	dbus_message_iter_append_basic(&struct_iter, DBUS_TYPE_UINT16, &val);
+	/*val = atomic_fetch_uint16_t(&gpfs_stats->total_ops);
+	dbus_message_iter_append_basic(&struct_iter, DBUS_TYPE_UINT16, &val); */
 	for (i = 0; i < GPFS_STAT_PH_INDEX; i++) {
 		if (i == GPFS_STAT_NO_OP_1 || i == GPFS_STAT_NO_OP_2
 		     || i == GPFS_STAT_NO_OP_3)
@@ -205,27 +205,31 @@ void fsal_gpfs_extract_stats(struct fsal_module *fsal_hdl, void *iter)
 				&gpfs_stats->op_stats[i].num_ops);
 		total_resp = atomic_fetch_uint64_t(
 				&gpfs_stats->op_stats[i].resp_time);
-		min_resp = atomic_fetch_uint64_t(
+		min_resp =  atomic_fetch_uint64_t(
 				&gpfs_stats->op_stats[i].resp_time_min);
-		max_resp = atomic_fetch_uint64_t(
+		max_resp =  atomic_fetch_uint64_t(
 				&gpfs_stats->op_stats[i].resp_time_max);
 
+		if (total_ops == 0)
+			continue;
+
+		/* We have valid stats */
 		message = gpfs_opcode_to_name(gpfs_stats->op_stats[i].op_code);
 		dbus_message_iter_append_basic(&struct_iter,
 				DBUS_TYPE_STRING, &message);
-		dbus_message_iter_append_basic(&struct_iter,
-			   DBUS_TYPE_UINT16, &gpfs_stats->op_stats[i].op_code);
-		if (total_ops == 0)
-			continue;
+		/*dbus_message_iter_append_basic(&struct_iter,
+			   DBUS_TYPE_UINT16, &gpfs_stats->op_stats[i].op_code);*/
 		dbus_message_iter_append_basic(&struct_iter,
 			DBUS_TYPE_UINT64, &total_ops);
-		avg_resp = (double) total_resp / total_ops;
+		res = (double) total_resp * 0.000001 / total_ops;
 		dbus_message_iter_append_basic(&struct_iter,
-			DBUS_TYPE_DOUBLE, &avg_resp);
+			DBUS_TYPE_DOUBLE, &res);
+		res = (double) min_resp * 0.000001;
 		dbus_message_iter_append_basic(&struct_iter,
-			DBUS_TYPE_UINT64, &min_resp);
+			DBUS_TYPE_DOUBLE, &res);
+		res = (double) max_resp * 0.000001;
 		dbus_message_iter_append_basic(&struct_iter,
-			DBUS_TYPE_UINT64, &max_resp);
+			DBUS_TYPE_DOUBLE, &res);
 	}
 	dbus_message_iter_close_container(iter1, &struct_iter);
 }

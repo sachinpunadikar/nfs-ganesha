@@ -1830,11 +1830,21 @@ static bool stats_disable(DBusMessageIter *args,
 	if (strcmp(stat_type, "all") == 0) {
 		nfs_param.core_param.enable_NFSSTATS = false;
 		nfs_param.core_param.enable_FSALSTATS = false;
+		LogEvent(COMPONENT_CONFIG,
+			 "Disabling NFS server statistics counting");
+		LogEvent(COMPONENT_CONFIG,
+			 "Disabling FSAL statistics counting");
 	}
-	if (strcmp(stat_type, "nfs") == 0)
+	if (strcmp(stat_type, "nfs") == 0) {
 		nfs_param.core_param.enable_NFSSTATS = false;
-	if (strcmp(stat_type, "fsal") == 0)
+		LogEvent(COMPONENT_CONFIG,
+			 "Disabling NFS server statistics counting");
+	}
+	if (strcmp(stat_type, "fsal") == 0) {
 		nfs_param.core_param.enable_FSALSTATS = false;
+		LogEvent(COMPONENT_CONFIG,
+			 "Disabling FSAL statistics counting");
+	}
 
 	dbus_status_reply(&iter, success, errormsg);
 	now(&timestamp);
@@ -1871,11 +1881,21 @@ static bool stats_enable(DBusMessageIter *args,
 	if (strcmp(stat_type, "all") == 0) {
 		nfs_param.core_param.enable_NFSSTATS = true;
 		nfs_param.core_param.enable_FSALSTATS = true;
+		LogEvent(COMPONENT_CONFIG,
+			 "Enabling NFS server statistics counting");
+		LogEvent(COMPONENT_CONFIG,
+			 "Enabling FSAL statistics counting");
 	}
-	if (strcmp(stat_type, "nfs") == 0)
+	if (strcmp(stat_type, "nfs") == 0) {
 		nfs_param.core_param.enable_NFSSTATS = true;
-	if (strcmp(stat_type, "fsal") == 0)
+		LogEvent(COMPONENT_CONFIG,
+			 "Enabling NFS server statistics counting");
+	}
+	if (strcmp(stat_type, "fsal") == 0) {
 		nfs_param.core_param.enable_FSALSTATS = true;
+		LogEvent(COMPONENT_CONFIG,
+			 "Enabling FSAL statistics counting");
+	}
 
 	dbus_status_reply(&iter, success, errormsg);
 	now(&timestamp);
@@ -1909,8 +1929,12 @@ static bool stats_fsal(DBusMessageIter *args,
 
 	dbus_message_iter_init_append(reply, &iter);
 
-	if (!nfs_param.core_param.enable_FSALSTATS)
+	if (!nfs_param.core_param.enable_FSALSTATS) {
+		success = false;
 		errormsg = "FSAL stat counting disabled";
+		dbus_status_reply(&iter, success, errormsg);
+		return true;
+	}	
 	dbus_message_iter_get_basic(args, &fsal_name);
 	init_root_op_context(&root_op_context, NULL, NULL,
 				     0, 0, UNKNOWN_REQUEST);

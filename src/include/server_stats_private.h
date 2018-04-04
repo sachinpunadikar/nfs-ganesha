@@ -177,7 +177,7 @@ struct export_stats {
 #define FSAL_OPS_REPLY      \
 {                            \
 	.name = "op",        \
-	.type = "(qa(sq(tdtt)))",     \
+	.type = "a(stddd)",     \
 	.direction = "out"   \
 }
 
