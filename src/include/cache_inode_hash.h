@@ -404,6 +404,7 @@ cih_set_latched(cache_entry_t *entry, cih_latch_t *latch,
 		uint32_t flags)
 {
 	cih_partition_t *cp = latch->cp;
+	struct avltree_node *node;
 
 	/* Omit hash if you are SURE we hashed it, and that the
 	 * hash remains valid */
@@ -412,7 +413,9 @@ cih_set_latched(cache_entry_t *entry, cih_latch_t *latch,
 				  fh_desc, CIH_HASH_NONE))
 			return 1;
 
-	(void)avltree_insert(&entry->fh_hk.node_k, &cp->t);
+	node = avltree_insert(&entry->fh_hk.node_k, &cp->t);
+	if (node) return 1;  /* key exists */
+
 	entry->fh_hk.inavl = true;
 
 	if (likely(flags & CIH_SET_UNLOCK))
