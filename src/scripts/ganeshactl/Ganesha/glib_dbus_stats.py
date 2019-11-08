@@ -577,7 +577,7 @@ class DumpFULLV3Stats():
             output += "NFSv3 Detailed statistics \n"
             output += "Stats collected since: " + time.ctime(self.stats[2][0]) + str(self.stats[2][1]) + " nsecs\n"
             output += "Duration: " + "%.10f" % self.duration + " seconds\n"
-            output += "\nOperation Details                         |  Operation Latency           "
+            output += "\nOperation Details                         |  Operation Latency (in milliseconds)"
             output += "\n==========================================|========================================"
             output += "\nName            Total     Error      Dups |       Avg          Min           Max   "
             i = 0
@@ -610,7 +610,7 @@ class DumpFULLV4Stats():
             output += "NFSv4 Detailed statistics \n"
             output += "Stats collected since: " + time.ctime(self.stats[2][0]) + str(self.stats[2][1]) + " nsecs\n"
             output += "Duration: " + "%.10f" % self.duration + " seconds\n"
-            output += "\nOperation Details                            |  Operation Latency                     "
+            output += "\nOperation Details                            |  Operation Latency (in milliseconds)"
             output += "\n=============================================|========================================"
             output += "\nName                        Total     Error  |       Avg          Min           Max   "
             i = 0
