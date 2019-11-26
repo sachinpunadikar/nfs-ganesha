@@ -20,7 +20,7 @@ def usage():
     message += "%s status \n" % (sys.argv[0])
     message += "To display stat counters use \n"
     message += "%s [list_clients | deleg <ip address> | " % (sys.argv[0])
-    message += "inode | iov3 [export id] | iov4 [export id] | export |"
+    message += " inode | iov3 [export id] | iov4 [export id] | export |"
     message += " total [export id] | fast | pnfs [export id] |"
     message += " fsal <fsal name> | v3_full | v4_full | auth |"
     message += " client_io_ops <ip address> | export_details <export id>] \n"
