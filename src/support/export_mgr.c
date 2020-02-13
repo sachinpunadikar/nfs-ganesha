@@ -2514,6 +2514,37 @@ static struct gsh_dbus_method fsal_statistics = {
 		 END_ARG_LIST}
 };
 
+/**
+ * DBUS method to get Cache Utilization Data
+ */
+static bool cache_utilization_data(DBusMessageIter *args,
+				DBusMessage *reply,
+				DBusError *error)
+{
+	bool success = true;
+	char *errormsg = "OK";
+	DBusMessageIter iter;
+	struct timespec timestamp;
+
+	now(&timestamp);
+	dbus_message_iter_init_append(reply, &iter);
+	dbus_status_reply(&iter, success, errormsg);
+	dbus_append_timestamp(&iter, &timestamp);
+
+	mdcache_utilization(&iter);
+
+	return true;
+}
+
+static struct gsh_dbus_method cache_data = {
+	.name = "CacheUtilization",
+	.method = cache_utilization_data,
+	.args = {STATUS_REPLY,
+		 TIMESTAMP_REPLY,
+		 CACHE_UTILIZATION_REPLY,
+		 END_ARG_LIST}
+};
+
 #ifdef _USE_9P
 /**
  * DBUS method to report 9p I/O statistics
@@ -2723,6 +2754,7 @@ static struct gsh_dbus_method *export_stats_methods[] = {
 	&v4_full_statistics,
 	&auth_statistics,
 	&export_details,
+	&cache_data,
 	NULL
 };
 

@@ -428,6 +428,13 @@ CLNT_CMP_OPS_REPLY
 	.direction = "out"  \
 }
 
+#define CACHE_UTILIZATION_REPLY      \
+{                           \
+	.name = "cache_data_utilization", \
+	.type = "stsussstst",     \
+	.direction = "out"  \
+}
+
 
 void server_stats_summary(DBusMessageIter * iter, struct gsh_stats *st);
 void server_dbus_client_io_ops(DBusMessageIter *iter,
@@ -450,6 +457,7 @@ void server_dbus_total_ops(struct export_stats *export_st,
 void global_dbus_total_ops(DBusMessageIter *iter);
 void server_dbus_fast_ops(DBusMessageIter *iter);
 void mdcache_dbus_show(DBusMessageIter *iter);
+void mdcache_utilization(DBusMessageIter *iter);
 void server_dbus_v3_full_stats(DBusMessageIter *iter);
 void server_dbus_v4_full_stats(DBusMessageIter *iter);
 void reset_server_stats(void);

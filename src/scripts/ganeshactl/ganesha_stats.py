@@ -31,6 +31,8 @@ def print_usage_exit(return_code):
     message += "\nTo enable/disable stat counters use: \n"
     message += "  %s [ enable | disable] [all | nfs | fsal | v3_full |\n" % (sys.argv[0])
     message += "           v4_full | auth | client_all_ops] \n"
+    message += "\nTo display cache resource utilization use: \n"
+    message += "  %s cache_utilization \n" % (sys.argv[0])
     print(message)
     sys.exit(return_code)
 
@@ -43,7 +45,7 @@ else:
 commands = ('help', 'list_clients', 'deleg', 'global', 'inode', 'iov3', 'iov4',
             'export', 'total', 'fast', 'pnfs', 'fsal', 'reset', 'enable',
             'disable', 'status', 'v3_full', 'v4_full', 'auth', 'client_io_ops',
-            'export_details', 'client_all_ops')
+            'export_details', 'client_all_ops', 'cache_utilization')
 if command not in commands:
     print("\nError: Option '%s' is not correct." % command)
     print_usage_exit(1)
@@ -136,5 +138,7 @@ try:
         print(exp_interface.disable_stats(command_arg))
     elif command == "status":
         print(exp_interface.status_stats())
+    elif command == "cache_utilization":
+        print(exp_interface.cache_utilization())
 except dbus.exceptions.DBusException:
     sys.exit("Error: Can't talk to ganesha service on d-bus. Looks like Ganesha is down")

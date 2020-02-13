@@ -143,6 +143,11 @@ class RetrieveExportStats():
         stats_op = self.exportmgrobj.get_dbus_method("GetExportDetails",
                                  self.dbus_exportstats_name)
         return ExportDetails(stats_op(export_id))
+    # status
+    def cache_utilization(self):
+        stats_state = self.exportmgrobj.get_dbus_method("CacheUtilization",
+                                  self.dbus_exportstats_name)
+        return DumpCacheUtilization(stats_state())
 
 
 class RetrieveClientStats():
@@ -839,4 +844,24 @@ class DumpFULLV4Stats():
                 output += " %12.6f" % (self.stats[3][i+4])
                 output += " %12.6f" % (self.stats[3][i+5])
                 i += 6
+            return output
+
+
+class DumpCacheUtilization():
+    def __init__(self, status):
+        self.curtime = time.time()
+        self.stats = status
+    def __str__(self):
+        output = ""
+        if not self.stats[0]:
+            return "Unable to fetch Cache Utilization Data - " + self.stats[1]
+        else:
+            self.starttime = self.stats[2][0] + self.stats[2][1] / 1e9
+            output += "Cache Utilization Data \n"
+            output += "Timestamp: " + time.ctime(self.stats[2][0]) + str(self.stats[2][1]) + " nsecs\n"
+            output += "\n" + (self.stats[3][0]).ljust(25) + "%s" % (str(self.stats[3][1]).rjust(20))
+            output += "\n" + (self.stats[3][2]).ljust(25) + "%s" % (str(self.stats[3][3]).rjust(20))
+            output += "\n" + (self.stats[3][4]).ljust(25) + (self.stats[3][5]).ljust(30)
+            output += "\n" + (self.stats[3][6]).ljust(25) + "%s" % (str(self.stats[3][7]).rjust(20))
+            output += "\n" + (self.stats[3][8]).ljust(25) + "%s" % (str(self.stats[3][9]).rjust(20))
             return output
