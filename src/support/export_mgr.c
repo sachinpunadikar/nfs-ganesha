@@ -1990,7 +1990,7 @@ static bool get_nfsv_global_fast_ops(DBusMessageIter *args,
 	return true;
 }
 
-static bool show_cache_inode_stats(DBusMessageIter *args,
+static bool show_mdcache_utilization(DBusMessageIter *args,
 				   DBusMessage *reply,
 				   DBusError *error)
 {
@@ -2002,7 +2002,8 @@ static bool show_cache_inode_stats(DBusMessageIter *args,
 	gsh_dbus_status_reply(&iter, success, errormsg);
 	gsh_dbus_append_timestamp(&iter, &nfs_ServerBootTime);
 
-	mdcache_dbus_show(&iter);
+	mdcache_inode_cache_stats(&iter);
+	mdcache_lru_utilization(&iter);
 
 	return true;
 }
@@ -2665,12 +2666,13 @@ static struct gsh_dbus_method global_show_fast_ops = {
 		 END_ARG_LIST}
 };
 
-static struct gsh_dbus_method cache_inode_show = {
-	.name = "ShowCacheInode",
-	.method = show_cache_inode_stats,
+static struct gsh_dbus_method mdcache_utilization_show = {
+	.name = "ShowMDCacheUtilization",
+	.method = show_mdcache_utilization,
 	.args = {STATUS_REPLY,
 		 TIMESTAMP_REPLY,
 		 TOTAL_OPS_REPLY,
+		 LRU_UTILIZATION_REPLY,
 		 END_ARG_LIST}
 };
 
@@ -2740,7 +2742,7 @@ static struct gsh_dbus_method *export_stats_methods[] = {
 #endif
 	&global_show_total_ops,
 	&global_show_fast_ops,
-	&cache_inode_show,
+	&mdcache_utilization_show,
 	&export_show_all_io,
 	&reset_statistics,
 	&fsal_statistics,

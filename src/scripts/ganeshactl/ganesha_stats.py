@@ -19,7 +19,7 @@ def print_usage_exit(return_code):
     message += "  %s status \n" % (sys.argv[0])
     message += "\nTo display stat counters use: \n"
     message += "  %s [ list_clients | deleg <ip address> |\n" % (sys.argv[0])
-    message += "          inode | iov3 [export id] | iov4 [export id] | export |\n"
+    message += "          mdcache_utilization | iov3 [export id] | iov4 [export id] | export |\n"
     message += "          total [export id] | fast | pnfs [export id] |\n"
     message += "          fsal <fsal name> | v3_full | v4_full | auth |\n"
     message += "          client_io_ops <ip address> | export_details <export id> |\n"
@@ -38,10 +38,10 @@ else:
     command = sys.argv[1]
 
 # check arguments
-commands = ('help', 'list_clients', 'deleg', 'global', 'inode', 'iov3', 'iov4',
-            'export', 'total', 'fast', 'pnfs', 'fsal', 'reset', 'enable',
-            'disable', 'status', 'v3_full', 'v4_full', 'auth', 'client_io_ops',
-            'export_details', 'client_all_ops')
+commands = ('help', 'list_clients', 'deleg', 'global', 'mdcache_utilization',
+            'iov3', 'iov4', 'export', 'total', 'fast', 'pnfs', 'fsal', 'reset',
+            'enable', 'disable', 'status', 'v3_full', 'v4_full', 'auth',
+            'client_io_ops', 'export_details', 'client_all_ops')
 if command not in commands:
     print("\nError: Option '%s' is not correct." % command)
     print_usage_exit(1)
@@ -96,8 +96,8 @@ try:
         print(exp_interface.global_stats())
     elif command == "export":
         print(exp_interface.export_stats())
-    elif command == "inode":
-        print(exp_interface.inode_stats())
+    elif command == "mdcache_utilization":
+        print(exp_interface.mdcache_stats())
     elif command == "fast":
         print(exp_interface.fast_stats())
     elif command == "list_clients":

@@ -428,6 +428,13 @@ CLNT_CMP_OPS_REPLY
 	.direction = "out"  \
 }
 
+#define LRU_UTILIZATION_REPLY           \
+{                                         \
+	.name = "lru_data_utilization", \
+	.type = "stsussstst",             \
+	.direction = "out"                \
+}
+
 extern struct timespec auth_stats_time;
 extern struct timespec v3_full_stats_time;
 extern struct timespec v4_full_stats_time;
@@ -452,7 +459,8 @@ void server_dbus_total_ops(struct export_stats *export_st,
 			   DBusMessageIter *iter);
 void global_dbus_total_ops(DBusMessageIter *iter);
 void server_dbus_fast_ops(DBusMessageIter *iter);
-void mdcache_dbus_show(DBusMessageIter *iter);
+void mdcache_inode_cache_stats(DBusMessageIter *iter);
+void mdcache_lru_utilization(DBusMessageIter *iter);
 void server_dbus_v3_full_stats(DBusMessageIter *iter);
 void server_dbus_v4_full_stats(DBusMessageIter *iter);
 void reset_server_stats(void);
