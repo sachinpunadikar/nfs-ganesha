@@ -231,7 +231,7 @@ CELOSTATS_REPLY
 	.direction = "out"	\
 }
 
-#define CLNT_ALL_OPS_REPLY    \
+#define CLNT_ALL_V3_OPS_REPLY    \
 {                           \
 	.name = "clnt_v3",  \
 	.type = "b",        \
@@ -243,7 +243,9 @@ CLNT_V3NLM_OPS_REPLY,            \
 	.type = "b",        \
 	.direction = "out"  \
 },                          \
-CLNT_V3NLM_OPS_REPLY,            \
+CLNT_V3NLM_OPS_REPLY
+
+#define CLNT_ALL_V4_OPS_REPLY  \
 {                           \
 	.name = "clnt_v4",  \
 	.type = "b",        \
@@ -438,7 +440,9 @@ CLNT_CMP_OPS_REPLY
 void server_stats_summary(DBusMessageIter * iter, struct gsh_stats *st);
 void server_dbus_client_io_ops(DBusMessageIter *iter,
 				struct gsh_client *client);
-void server_dbus_client_all_ops(DBusMessageIter *iter,
+void server_dbus_client_all_V3_ops(DBusMessageIter *iter,
+				struct gsh_client *client);
+void server_dbus_client_all_V4_ops(DBusMessageIter *iter,
 				struct gsh_client *client);
 void server_dbus_export_details(DBusMessageIter *iter,
 				struct gsh_export *g_export);
@@ -463,11 +467,13 @@ void reset_server_stats(void);
 void reset_export_stats(void);
 void reset_client_stats(void);
 void reset_gsh_stats(struct gsh_stats *st);
-void reset_gsh_allops_stats(struct gsh_clnt_allops_stats *st);
+void reset_gsh_allV3ops_stats(struct gsh_clnt_allops_stats *st);
+void reset_gsh_allV4ops_stats(struct gsh_clnt_allops_stats *st);
 void reset_v3_full_stats(void);
 void reset_v4_full_stats(void);
 void reset_auth_stats(void);
-void reset_clnt_allops_stats(void);
+void reset_clnt_allV3ops_stats(void);
+void reset_clnt_allV4ops_stats(void);
 
 #ifdef _USE_9P
 void server_dbus_9p_iostats(struct _9p_stats *_9pp, DBusMessageIter *iter);
